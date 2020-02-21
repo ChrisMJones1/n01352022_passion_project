@@ -1,0 +1,142 @@
+﻿@model GymBuildr.Models.ViewModels.ModifyBuilds
+
+
+@{
+    ViewBag.Title = "Modify";
+    //create a dictionary for the potential prices to act as empty string holders to assign the selected attribute to
+    Dictionary<int, string> selectOption = new Dictionary<int, string>();
+    selectOption.Add(0, "");
+    selectOption.Add(50, "");
+    selectOption.Add(100, "");
+    selectOption.Add(200, "");
+    selectOption.Add(400, "");
+    selectOption.Add(800, "");
+    selectOption.Add(801, "");
+
+    //assign the selected value to the price range that matches the provided price range
+
+    selectOption[Model.priceRange] = " selected ";
+
+}
+
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+<style>
+    .selected {
+        background-color: aqua;
+    }
+</style>
+<script>
+    $( function() {
+        $(".selectbox").on("click", function () {
+            $(this).find(".stylebox").toggleClass("bg-success");
+            var addCheckBox = $(this).find(".add");
+            var deleteCheckBox = $(this).find(".delete");
+            addCheckBox.prop("checked", !addCheckBox.prop("checked"));
+            deleteCheckBox.prop("checked", !deleteCheckBox.prop("checked"));
+        });
+    });
+</script>
+
+
+
+@*<h2>Gym Items</h2>*@
+@*<div class="container">
+        <a class="btn btn-info" role="button" href="/Items/Add/">Add Item</a>
+    </div>*@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-2 px-0">
+            <form method="get" class="sticky-top" action="~/Build/Modify/@Model.build.BuildID" id="search" name="search">
+                <div class="container bg-dark text-white p-1">
+                    <h2 class="accent-1">Sort Options</h2>
+                    @{
+                        foreach (var category in Model.itemCategories)
+                        {
+                            <div class="container">
+                                <input type="checkbox" id="category_@category.ItemCategoryID" name="categories" value="@category.ItemCategoryID"
+                                       @{if (Model.selectedItemCategories.Contains(category)) { @: checked
+                                       } } />
+                                <label for="category_@category.ItemCategoryID">@category.CategoryName</label>
+                            </div>
+                        }
+                        <label for="price_range">Price Range:</label>
+                        <select name="price_range" class="form-control" id="price_range">
+                            <option @selectOption[0] value="0">ALL</option>
+                            <option @selectOption[50] value="50">0-50</option>
+                            <option @selectOption[100] value="100">50-100</option>
+                            <option @selectOption[200] value="200">100-200</option>
+                            <option @selectOption[400] value="400">200-400</option>
+                            <option @selectOption[800] value="800">400-800</option>
+                            <option @selectOption[801] value="801">800+</option>
+                        </select>
+                        <div class="container pt-3 mx-auto">
+                            <div class="container text-center"><input type="submit" class="btn btn-secondary" name="filter" value="filter" /></div>
+                            
+                        </div>
+                        
+                    }
+                </div>
+            </form>
+        </div>
+
+        <div class="col-10">
+            <form method="post" action="/Build/Modify/@Model.build.BuildID">
+                <div class="row align-content-center bg-dark text-white sticky-top">
+                    <div class="col"><h2>@Model.build.BuildName</h2></div>
+                    <div class="col"><input type="submit" name="submit" class="btn btn-success float-right" value="Update List" /></div>
+                    
+                </div>
+                
+                <div class="container">
+                    @{
+                        var counter = 1;
+                        foreach (var items in Model.items)
+                        {
+                            string selected = "";
+                            string checkbox = "add";
+
+                            if (counter == 1)
+                            {
+                                //must trick razor parser to render tag without closing
+                                @:<div class="row m-1">
+                                }
+                                if (Model.buildItems.Contains(items))
+                                {
+                                    selected = "bg-success";
+                                    checkbox = "delete";
+
+                                }
+
+
+                                <div class="col-3 selectbox item_@items.ItemID">
+                                    <div class="p-1 stylebox border border-dark @selected">
+                                        <img class="img-fluid" src="~/Images/@items.ItemImagePath" alt="@items.ItemName" />
+                                        <div>@items.ItemBrand</div>
+                                        <div>@items.ItemName</div>
+                                        <div>$@items.ItemPrice CAD</div>
+
+                                        @* Insert logic to have it if else the add and delete options, depending on whether the item has been selected *@
+                                        <input id="option_@items.ItemID" class="@checkbox d-none" name="@checkbox" value="@items.ItemID" type="checkbox" />
+                                    </div>
+                                </div>
+
+                                if (counter == 4)
+                                {
+                                @:</div>
+                                counter = 0;
+                            }
+                            counter++;
+
+                        }
+                        if (counter != 4)
+                        {
+                        @:</div>
+                    }
+                    }
+            </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,1 @@
+﻿select * from Items where ItemPrice >= 0

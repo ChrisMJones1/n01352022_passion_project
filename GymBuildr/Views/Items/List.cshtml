@@ -1,0 +1,113 @@
+﻿@model GymBuildr.Models.ViewModels.ListItems
+
+
+@{
+    ViewBag.Title = "List";
+    //create a dictionary for the potential prices to act as empty string holders to assign the selected attribute to
+    Dictionary<int, string> selectOption = new Dictionary<int, string>();
+    selectOption.Add(0, "");
+    selectOption.Add(50, "");
+    selectOption.Add(100, "");
+    selectOption.Add(200, "");
+    selectOption.Add(400, "");
+    selectOption.Add(800, "");
+    selectOption.Add(801, "");
+
+    //assign the selected value to the price range that matches the provided price range
+
+    selectOption[Model.priceRange] = " selected ";
+
+}
+
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+<script>
+    $( function() {
+    $( ".selectbox" ).on( "click", function() {
+        var addCheckBox = $(this).find(".add");
+        var deleteCheckBox = $(this).find(".delete");
+        addCheckBox.prop("checked", !addCheckBox.prop("checked"));
+        deleteCheckBox.prop("checked", !deleteCheckBox.prop("checked"));
+    });
+  } );
+</script>
+
+
+
+<h2>Gym Items</h2>
+@*<div class="container">
+        <a class="btn btn-info" role="button" href="/Items/Add/">Add Item</a>
+    </div>*@
+
+<div class="container">
+    <form method="get" action="~/Items/List" id="search" name="search">
+        <div class="container">
+            @{
+                foreach (var category in Model.itemCategories)
+                {
+                    <div class="container">
+                        <input type="checkbox" id="category_@category.ItemCategoryID" name="categories" value="@category.ItemCategoryID"
+                               @{if (Model.selectedItemCategories.Contains(category)) { @: checked
+                               } } />
+                        <label for="category_@category.ItemCategoryID">@category.CategoryName</label>
+                    </div>
+                }
+                <select name="price_range" id="price_range">
+                    <option @selectOption[0] value="0">ALL</option>
+                    <option @selectOption[50] value="50">0-50</option>
+                    <option @selectOption[100] value="100">50-100</option>
+                    <option @selectOption[200] value="200">100-200</option>
+                    <option @selectOption[400] value="400">200-400</option>
+                    <option @selectOption[800] value="800">400-800</option>
+                    <option @selectOption[801] value="801">800+</option>
+                </select>
+                <input type="submit" name="filter" value="filter" />
+            }
+        </div>
+    </form>
+</div>
+
+<form method="post" action="">
+    <div class="container">
+        @{
+            var counter = 1;
+            foreach (var items in Model.items)
+            {
+
+                if (counter == 1)
+                {
+                    //must trick razor parser to render tag without closing
+                    @:<div class="row">
+                    }
+
+
+                          <div class="col-3 selectbox item_@items.ItemID">
+                              @*<label class="selectbox" for="option_@items.ItemID">*@
+                                  <img src="~/Images/@items.ItemImagePath" />
+                                  <div>@items.ItemBrand</div>
+                                  <div>@items.ItemName</div>
+                                  <div>@items.ItemPrice</div>
+                              @*</label>*@
+                              @* Insert logic to have it if else the add and delete options, depending on whether the item has been selected *@
+                              <input id="option_@items.ItemID" class="add" name="add" value="@items.ItemID" type="checkbox" />
+                              @*put in a hidden input to act as the delete indicator*@
+                              @* ADD IN LOGIC TO INSERT ONLY WHEN ITEM HAS BEEN PRESELECTED *@
+                              <input type="checkbox" id="delete_@items.ItemID" name="delete" checked class="delete bg-danger" value="@items.ItemID" />
+                          </div>
+                    
+                    if (counter == 4)
+                    {
+                    @:</div>
+                    counter = 0;
+                }
+                counter++;
+
+            }
+            if (counter != 4)
+            {
+            @:</div>
+        }
+        }
+        </div>
+    </form>
